@@ -111,6 +111,8 @@ data PrimaryColor = Red | Green | Blue
 We can tell Haskell that `PrimaryColor`s can be compared for equality
 like this:
 -}
+-- Instance is just instantiation/implementation of interface
+-- basically makes the type part of a designated class
 
 instance Eq PrimaryColor where
   (==) :: PrimaryColor -> PrimaryColor -> Bool
@@ -166,7 +168,9 @@ by using 'deriving' like we saw in [`Lec4`](Lec4.html)!)
 
 instance Eq a => Eq (Tree a) where
   (==) :: Tree a -> Tree a -> Bool
-  t1 == t2 = undefined
+  Empty == Empty = True
+  (Branch a al ar) == (Branch b bl br) = a == b && (al == bl) && (ar == br)
+  _ == _ = False
 
 {-
 This code tells Haskell how to compare `Tree a`s for equality as long
@@ -235,7 +239,11 @@ Quickly, without looking at the rest of the lecture notes, brainstorm as many
 *overloaded* operations as you can. What overloaded functions have you seen
 in other languages? What about from your mathematics classes?
 
-FILL IN EXAMPLES HERE
+Sorting
+Binary search
+Maybe hashmaps + sets?
+Getting the length of an array/string
+Deep copy
 
 Overloading is sometimes called *ad hoc* polymorphism, for good reason.
 Allowing unrelated functions to have the same name can lead to messy,
@@ -311,6 +319,14 @@ Of course, not every type class supports this "deriving" mechanism.
 GHC can derive instances of a handful of classes for us (we'll see a
 few more today), but for most standard library type classes and any
 classes you define, you must write the instances out yourself.
+
+Makes sense
+First, custom data types can have -> membership in a specific class
+-	Second, functions that use that class’s operators such as == or
+ ++ have to also declare that the arguments are type of that class
+ - Third, functions that use the aforementioned functions also have to declare
+ -- that the type of the argument is in the class -> these overloaded functions
+  -- have to follow specific rules in terms of how the types are used
 
 Show and Read
 =============
@@ -516,6 +532,10 @@ one is for comparisons.  It is used in the type of `(<)`:
 `Ord` is a type class for things that can be ordered.  Here is its
 definition:
 
+-- classes can themselves have class constraints!!
+Check this class out
+User declared classes can exist as well
+
     class Eq a => Ord a where
         compare              :: a -> a -> Ordering
         (<), (<=), (>), (>=) :: a -> a -> Bool
@@ -539,7 +559,9 @@ already have `Ord` instances (try some examples in ghci).
 
 What properties should instances of `Ord` satisfy?  Write some below:
 
-<undefined>
+For every 2 elements, must be either a LT | EQ | GT relationship between the 2
+Transitivity a < b < c so a < c
+Every distinct element pair must be comparable
 
 `Ord` is derivable, like `Eq`, `Show` and `Read`.  If you're writing
 your own `Ord` instance, you only need to provide `compare` or `(<=)`;
@@ -622,6 +644,7 @@ instance Num a => Num [a] where
 Code that uses this instance looks a bit strange...
 -}
 
+-- YELLOW (infinite list?)
 one :: [Int]
 one = 1 -- the fromInteger instance converts the Integer 1 into a list
 -- by first converting it to an Int and then repeating it
@@ -747,6 +770,8 @@ The standard library defines:
 We can define a `Functor` instance for our own trees:
 -}
 
+-- instance = implementation of "interface/class" functions
+
 instance Functor Tree where
   fmap :: (a -> b) -> Tree a -> Tree b
   fmap = treeMap
@@ -785,7 +810,7 @@ See if you can define a Functor instance for this type:
 data Two a = MkTwo a a deriving (Eq, Show, Read, Ord)
 
 instance Functor Two where
-  fmap = undefined
+  fmap f (MkTwo a b) = MkTwo (f a) (f b)
 
 {-
 In the meantime, think about what laws instances of this class should
