@@ -978,3 +978,9 @@ More information
 * For more details, "Classes, Jim, but not as we know them," lecture from
 [OPLSS13](http://www.cs.uoregon.edu/research/summerschool/summer13/lectures/ClassesJimOPLSS.pdf).
 -}
+
+-- NOTES
+
+-- THe point of type classes is to do overloading in a sensible way
+-- so what is a functor exactly
+-- HAS THE ABILITY to talk about overloading based on type constructors
