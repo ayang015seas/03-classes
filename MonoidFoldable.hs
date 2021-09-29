@@ -10,7 +10,7 @@ date: September 29, 2019
 module MonoidFoldable where
 
 import qualified Data.List as List
-import Test.HUnit
+import Test.HUnit (Test (TestList), runTestTT, (~?=))
 import Prelude hiding (all, and, any, or)
 
 {-
@@ -30,6 +30,12 @@ For example, because the `String` type is an instance of this class
 (using `++` for `mappend`) we can `foldList` a list of `String`s to
 a single string.
 -}
+
+-- GREEN
+-- to summarize, we first defined monoid/semigroups for specific operators
+-- foldmap basically turned list elements into these monoids and combined them
+-- using the methods we specified
+-- we also implemented foldmap for funzies
 
 tm0 :: Test
 tm0 = foldList ["C", "I", "S", "5", "5", "2"] ~?= "CIS552"
@@ -70,22 +76,27 @@ allT2 :: Test
 allT2 = getAnd (foldList (fmap And [True, False, True])) ~?= False
 
 instance Semigroup And where
-  (<>) = undefined
+  (<>) x y = And {getAnd = getAnd x && getAnd y}
 
 instance Monoid And where
-  mempty = undefined
+  mempty = And {getAnd = True}
 
 instance Semigroup Or where
-  (<>) = undefined
+  (<>) x y = Or {getOr = getOr x || getOr y}
 
 instance Monoid Or where
-  mempty = undefined
+  mempty = Or {getOr = False}
 
 {-
 Because `And` and `Or` wrap boolean values, we can be sure that our instances
 have the right properties by testing the truth tables.  (There are more
 concise to write these tests, but we haven't covered them yet.)
 -}
+
+-- >>> runTestTT monoidAnd
+-- >>> runTestTT monoidOr
+-- Counts {cases = 12, tried = 12, errors = 0, failures = 0}
+-- Counts {cases = 12, tried = 12, errors = 0, failures = 0}
 
 monoidAnd :: Test
 monoidAnd =
@@ -139,14 +150,21 @@ and = getAnd . foldMap And
 Your job is to define these three related operations
 -}
 
+-- foldable just means that the data structure must have foldMap implemented
+-- So that way we know this foldmap is valid
+-- we use instance Tree Foldable to make tree be part of the foldable class
+-- the foldMap makes use of the monoid mempty and associated operators
+-- because And/Or are semigroup/monoids. Since <> only works on semigroups, we need
+-- to turn the list elements into semigroups/monoids in order for foldmap to execute
+
 or :: Foldable t => t Bool -> Bool
-or = undefined
+or x = (getOr . foldMap Or) x
 
 all :: Foldable t => (a -> Bool) -> t a -> Bool
-all f = undefined
+all f = getAnd . foldMap (And . f)
 
 any :: Foldable t => (a -> Bool) -> t a -> Bool
-any f = undefined
+any f = getOr . foldMap (Or . f)
 
 {-
 so that the following tests pass
@@ -191,7 +209,8 @@ But, for practice, complete the instance using `foldMap`.
 -}
 
 instance Foldable Tree where
-  foldMap = undefined
+  foldMap f Empty = mempty
+  foldMap f (Branch a b c) = foldMap f b <> f a <> foldMap f c
 
 {-
 With this instance, we can for example, verify that all of the sample strings
