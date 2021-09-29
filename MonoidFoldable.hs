@@ -1,12 +1,11 @@
 {-
 ---
 fulltitle: "In class exercise: Semigroup, Monoid and Foldable"
+date: September 29, 2019
 ---
 -}
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE FlexibleInstances #-}
-
--- {-# OPTIONS_GHC -fdefer-type-errors #-}
 
 module MonoidFoldable where
 
@@ -17,10 +16,8 @@ import Prelude hiding (all, and, any, or)
 {-
 Monoids
 -------
-
 First, read just the 'Semigroups and Monoids' section of HW 03's
 [SortedList](../../../hw/hw03/SortedList.html) module.
-
 Note that this section defines the following function that tailors a fold
 operation to a specific instance of the `Monoid` class.
 -}
@@ -53,17 +50,14 @@ Make sure that you understand these type definitions. We are defining a type
 data constructor is a record with a single field, called `getAnd`. What this
 means is that `And` and `getAnd` allow us to convert `Bool`s to `And` and
 back.
-
       λ> :t And
       And :: Bool -> And
       λ> :t getAnd
       getAnd :: And -> Bool
-
 Above, `newtype` is like data, but is restricted to a single variant. It is
 typically used to create a new name for an existing type. This new name allows
 us to have multiple instances for the same type (as below) or to provide type
 abstraction (like `SortedList` in the HW).
-
 Your job is to complete these instances that can tell us whether any of the
 booleans in a list are true, or whether all of the booleans in a list are
 true. (See two test cases below for an example of the behavior.)
@@ -130,13 +124,10 @@ monoidOr =
 {-
 Foldable
 --------
-
 Now, read the section marked `The Foldable Typeclass` in the
 [MergeSort](../../../hw/hw03/MergeSort.html) module.
-
 We can use your Monoid instances for `Or` and `And` to generalize
 operations to any data structure.
-
 For example, we can generalize the `and` operation to any Foldable data
 structure using `foldMap`.
 -}
@@ -179,7 +170,6 @@ tf4 = any (> 0) [-1 :: Int, -2, -4, -18] ~?= False
 {-
 Application
 -----------
-
 Recall our familiar `Tree` type. Haskell can derive the `Functor` instance for this type so we ask it to do so.
 -}
 
@@ -197,7 +187,6 @@ t1 = Branch "d" (Branch "b" (l "a") (l "c")) (Branch "f" (l "e") (l "g"))
 {-
 We *could* make this type an instance of `Foldable` using the definition of
 `foldrTree` from the TreeFolds module.
-
 But, for practice, complete the instance using `foldMap`.
 -}
 
@@ -214,7 +203,7 @@ tt1 = all ((== 1) . length) t1 ~?= True
 
 {-
 Finally, look at the documentation for the
-[Foldable](https://hackage.haskell.org/package/base-4.10.0.0/docs/Data-Foldable.html)
+[Foldable](https://hackage.haskell.org/package/base-4.14.1.0/docs/Data-Foldable.html)
 class and find some other tree operations that we get automatically for
 free.
 -}
